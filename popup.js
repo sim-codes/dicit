@@ -74,11 +74,23 @@ function showDefinitionError(word, errorMessage) {
   document.getElementById('mainContent').style.display = 'none';
   document.getElementById('definitionContainer').classList.add('visible');
 
+  // Determine if this is an offline error and add appropriate badge
+  const isOfflineError = errorMessage.includes('offline dictionary') || !navigator.onLine;
+  let sourceIndicator = '';
+  if (isOfflineError) {
+    if (!navigator.onLine) {
+      sourceIndicator = '<span class="offline-badge">🔒 NO INTERNET</span>';
+    } else {
+      sourceIndicator = '<span class="offline-badge">📚 OFFLINE</span>';
+    }
+  }
+
   const content = document.getElementById('definitionContent');
   content.innerHTML = `
     <div class="definition-header">
       <div class="word-info">
         <h2 class="word-title">${word}</h2>
+        ${sourceIndicator}
       </div>
     </div>
     <div class="error">
@@ -90,15 +102,25 @@ function showDefinitionError(word, errorMessage) {
 function createDefinitionHTML(word, definition) {
   const meanings = definition.meanings || [];
   const audioUrl = getAudioUrl(definition);
+  
+  // Determine if this is an offline definition and add appropriate badge
+  const isOfflineDefinition = definition.isOffline || !navigator.onLine;
+  let sourceIndicator = '';
+  if (definition.isOffline) {
+    sourceIndicator = '<span class="offline-badge">📚 OFFLINE</span>';
+  } else if (!navigator.onLine) {
+    sourceIndicator = '<span class="offline-badge">🔒 NO INTERNET</span>';
+  }
 
   let html = `
     <div class="definition-header">
       <div class="word-info">
         <h2 class="word-title">${word}</h2>
+        ${sourceIndicator}
         ${definition.phonetic ? `<div class="phonetic">${definition.phonetic}</div>` : ''}
       </div>
       <div>
-        ${audioUrl ? `<button class="audio-btn" data-audio="${audioUrl}">🔊 Play</button>` : ''}
+        ${audioUrl && navigator.onLine ? `<button class="audio-btn" data-audio="${audioUrl}">🔊 Play</button>` : ''}
       </div>
     </div>
   `;
