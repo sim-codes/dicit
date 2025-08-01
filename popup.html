@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dicit Dictionary</title>
+    <style>
+    body {
+      width: 400px;
+      min-height: 200px;
+      max-height: 600px;
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8f9fa;
+      overflow-y: auto;
+    }        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .instructions {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 16px;
+        }
+
+        .instructions h3 {
+            margin: 0 0 12px 0;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+
+        .instructions ol {
+            margin: 0;
+            padding-left: 20px;
+            color: #555;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .footer {
+            text-align: center;
+            color: #95a5a6;
+            font-size: 12px;
+            margin-top: 16px;
+        }
+
+        .highlight {
+            background: #3498db;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .status {
+            margin-top: 12px;
+            padding: 8px;
+            background: #e8f5e8;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #2d5a2d;
+        }
+
+        .settings {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 16px;
+        }
+
+        .settings h3 {
+            margin: 0 0 12px 0;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+
+        .setting-item {
+            margin-bottom: 12px;
+        }
+
+        .setting-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #555;
+            user-select: none;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .checkmark {
+            margin-left: 4px;
+        }
+
+        /* Definition display styles */
+        .definition-container {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .definition-container.visible {
+            display: block;
+        }
+
+        .definition-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e8f4fd;
+        }
+
+        .word-info {
+            flex: 1;
+        }
+
+        .word-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .phonetic {
+            color: #7f8c8d;
+            font-style: italic;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .close-definition {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-definition:hover {
+            background: #c0392b;
+        }
+
+        .meaning {
+            margin-bottom: 20px;
+        }
+
+        .meaning:last-child {
+            margin-bottom: 0;
+        }
+
+        .part-of-speech {
+            background: #3498db;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 12px;
+            text-transform: capitalize;
+        }
+
+        .definitions-list {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .definitions-list li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+            color: #2c3e50;
+        }
+
+        .example {
+            font-style: italic;
+            color: #7f8c8d;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .audio-btn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .audio-btn:hover {
+            background: #27ae60;
+        }
+
+        .loading {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .back-btn {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-bottom: 16px;
+        }
+
+        .back-btn:hover {
+            background: #7f8c8d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo">📚 Dicit</div>
+        <div class="subtitle">Dictionary Extension</div>
+    </div>
+
+    <!-- Definition display container -->
+    <div id="definitionContainer" class="definition-container">
+        <button id="backBtn" class="back-btn">← Back to Settings</button>
+        <div id="definitionContent"></div>
+    </div>
+
+    <!-- Main content container -->
+    <div id="mainContent">
+        <div class="instructions">
+            <h3>How to use:</h3>
+            <ol>
+                <li><span class="highlight">Highlight</span> any single word on a webpage</li>
+                <li>View instant definitions in a tooltip</li>
+                <li>Or <span class="highlight">right-click</span> and select "Define [word]"</li>
+                <li>Click the × to close or press Escape</li>
+            </ol>
+            
+            <div class="status">
+                <strong>Status:</strong> Extension is active ✅
+            </div>
+        </div>
+
+        <div class="settings">
+            <h3>Settings:</h3>
+            <div class="setting-item">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="includeExamples" checked>
+                    <span class="checkmark"></span>
+                    Include examples in definitions
+                </label>
+            </div>
+            <div class="setting-item">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="showPhonetics" checked>
+                    <span class="checkmark"></span>
+                    Show pronunciation (phonetics)
+                </label>
+            </div>
+            <div class="setting-item">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="includeAudio" checked>
+                    <span class="checkmark"></span>
+                    Include audio pronunciation
+                </label>
+            </div>
+        </div>
+
+        <div class="footer">
+            Powered by Free Dictionary API
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>

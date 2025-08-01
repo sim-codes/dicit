@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dicit Extension with PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .instructions {
+            background: #e8f4f8;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin: 10px 0;
+        }
+        .sample-text {
+            background: white;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .highlight {
+            background: yellow;
+            padding: 2px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Test Dicit Dictionary Extension</h1>
+    
+    <div class="instructions">
+        <h3>📋 Testing Instructions</h3>
+        <ol>
+            <li>Make sure the Dicit extension is installed and enabled</li>
+            <li>Enable "Allow access to file URLs" in the extension settings</li>
+            <li>Test with the sample text below first</li>
+            <li>Then test with a PDF file</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>🌐 Test with Regular Web Content</h2>
+        <div class="sample-text">
+            <p>Try highlighting these words to test the dictionary functionality:</p>
+            <ul>
+                <li><strong>Serendipity</strong> - a pleasant surprise</li>
+                <li><strong>Ubiquitous</strong> - present everywhere</li>
+                <li><strong>Ephemeral</strong> - lasting for a short time</li>
+                <li><strong>Eloquent</strong> - fluent and persuasive speech</li>
+                <li><strong>Resilient</strong> - able to recover quickly</li>
+                <li><strong>Meticulous</strong> - showing great attention to detail</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📄 Test with PDF Files</h2>
+        
+        <div class="instructions">
+            <h4>Method 1: Using File Explorer</h4>
+            <ol>
+                <li>Open File Explorer and navigate to any PDF file on your computer</li>
+                <li>Drag and drop the PDF into a Chrome browser tab</li>
+                <li>Try highlighting any word in the PDF</li>
+                <li>The Dicit tooltip should appear with the definition</li>
+            </ol>
+        </div>
+
+        <div class="instructions">
+            <h4>Method 2: Using Browser's Open File</h4>
+            <ol>
+                <li>Press <code>Ctrl + O</code> in Chrome/Edge</li>
+                <li>Select any PDF file from your computer</li>
+                <li>Highlight words in the PDF to test the extension</li>
+            </ol>
+        </div>
+
+        <div class="instructions">
+            <h4>Method 3: Test with Online PDF</h4>
+            <p>You can also test with online PDFs. Try these links:</p>
+            <ul>
+                <li><a href="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" target="_blank">Sample PDF 1</a></li>
+                <li><a href="https://www.adobe.com/content/dam/acom/en/devnet/acrobat/pdfs/pdf_open_parameters.pdf" target="_blank">Adobe PDF Sample</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Troubleshooting</h2>
+        
+        <h4>If the extension doesn't work with PDFs:</h4>
+        <ol>
+            <li><strong>Check File URL Permission</strong>: Go to <code>chrome://extensions/</code> (Chrome) or <code>edge://extensions/</code> (Edge), find Dicit, click "Details", and enable "Allow access to file URLs"</li>
+            <li><strong>Reload the Extension</strong>: In the extensions page, click the reload icon for Dicit</li>
+            <li><strong>Restart Browser</strong>: Close all browser windows and restart Chrome/Edge</li>
+            <li><strong>Check Console</strong>: Press F12, go to Console tab, and look for any Dicit-related messages</li>
+        </ol>
+
+        <h4>Expected Behavior:</h4>
+        <ul>
+            <li>✅ Extension works on regular websites</li>
+            <li>✅ Extension works on PDFs opened in Chrome/Edge</li>
+            <li>✅ Tooltip appears with enhanced styling for PDFs</li>
+            <li>✅ Console shows "PDF detected" messages when working with PDFs</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>📱 Alternative Solutions for Local PDFs</h2>
+        
+        <div class="instructions">
+            <h4>If Chrome PDF integration doesn't work perfectly:</h4>
+            <ol>
+                <li><strong>Use Online PDF Tools</strong>: Convert PDF to HTML temporarily for better text selection</li>
+                <li><strong>Copy and Paste</strong>: Copy text from PDF and paste into this page to use the extension</li>
+                <li><strong>PDF Viewers</strong>: Use Chrome-based PDF viewers or web apps</li>
+                <li><strong>Browser PDF Readers</strong>: Some online PDF readers work better with extensions</li>
+                <li><strong>Edge/Chrome Compatibility</strong>: The extension now works with both browsers</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Add some debug logging for the test page
+        console.log('Dicit Test Page Loaded');
+        
+        // Monitor text selection
+        document.addEventListener('mouseup', () => {
+            const selection = window.getSelection().toString();
+            if (selection) {
+                console.log('Test page: Text selected:', selection);
+            }
+        });
+
+        // Add highlighting effect for demonstration
+        document.addEventListener('mouseup', () => {
+            setTimeout(() => {
+                const selection = window.getSelection();
+                if (selection.toString().trim().length > 0) {
+                    console.log('Selection made on test page:', selection.toString());
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+<!-- This is a placeholder SVG icon. You can replace this with actual PNG icons -->
+<svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="20" fill="#3498db"/>
+  <text x="64" y="75" font-family="Arial, sans-serif" font-size="60" fill="white" text-anchor="middle">📚</text>
+</svg>
