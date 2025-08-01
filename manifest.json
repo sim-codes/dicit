@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
     "name": "Dicit - Dictionary Extension",
-    "version": "1.0",
-    "description": "Get word definitions by highlighting text in your browser",
+    "version": "1.1",
+    "description": "Get word definitions by highlighting text in your browser - works offline!",
     "permissions": [
         "activeTab",
         "storage",
@@ -21,6 +21,7 @@
                 "<all_urls>"
             ],
             "js": [
+                "offline-dictionary.js",
                 "content.js"
             ],
             "css": [
@@ -32,5 +33,11 @@
     "action": {
         "default_popup": "popup.html",
         "default_title": "Dicit Dictionary"
-    }
+    },
+    "web_accessible_resources": [
+        {
+            "resources": ["data/dictionary.json"],
+            "matches": ["<all_urls>"]
+        }
+    ]
 }

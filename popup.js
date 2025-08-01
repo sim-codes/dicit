@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
   // Check if we should show a definition (from context menu or other source)
   const definitionData = await chrome.storage.local.get('pendingDefinition');
-  
+
   if (definitionData.pendingDefinition) {
     // Clear the pending definition and show it
     await chrome.storage.local.remove('pendingDefinition');
@@ -21,13 +21,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const settings = await chrome.storage.sync.get({
     includeExamples: true,
     showPhonetics: true,
-    includeAudio: true
+    includeAudio: true,
+    offlineMode: false
   });
 
   // Set checkbox states
   document.getElementById('includeExamples').checked = settings.includeExamples;
   document.getElementById('showPhonetics').checked = settings.showPhonetics;
   document.getElementById('includeAudio').checked = settings.includeAudio;
+  document.getElementById('offlineMode').checked = settings.offlineMode;
 
   // Add event listeners for settings
   document.getElementById('includeExamples').addEventListener('change', (e) => {
@@ -40,6 +42,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('includeAudio').addEventListener('change', (e) => {
     chrome.storage.sync.set({ includeAudio: e.target.checked });
+  });
+
+  document.getElementById('offlineMode').addEventListener('change', (e) => {
+    chrome.storage.sync.set({ offlineMode: e.target.checked });
   });
 
   // Add back button listener
@@ -56,10 +62,10 @@ function showMainContent() {
 function showDefinition(word, definition) {
   document.getElementById('mainContent').style.display = 'none';
   document.getElementById('definitionContainer').classList.add('visible');
-  
+
   const content = document.getElementById('definitionContent');
   content.innerHTML = createDefinitionHTML(word, definition);
-  
+
   // Add event listeners for audio and close buttons
   addDefinitionEventListeners();
 }
@@ -67,7 +73,7 @@ function showDefinition(word, definition) {
 function showDefinitionError(word, errorMessage) {
   document.getElementById('mainContent').style.display = 'none';
   document.getElementById('definitionContainer').classList.add('visible');
-  
+
   const content = document.getElementById('definitionContent');
   content.innerHTML = `
     <div class="definition-header">
@@ -76,7 +82,7 @@ function showDefinitionError(word, errorMessage) {
       </div>
     </div>
     <div class="error">
-      ${errorMessage === 'Word not found' ? 'No definition found for this word.' : 'Failed to fetch definition.'}
+      ${errorMessage}
     </div>
   `;
 }
@@ -84,7 +90,7 @@ function showDefinitionError(word, errorMessage) {
 function createDefinitionHTML(word, definition) {
   const meanings = definition.meanings || [];
   const audioUrl = getAudioUrl(definition);
-  
+
   let html = `
     <div class="definition-header">
       <div class="word-info">
@@ -101,10 +107,15 @@ function createDefinitionHTML(word, definition) {
     meanings.forEach(meaning => {
       html += `
         <div class="meaning">
-          <div class="part-of-speech">${meaning.partOfSpeech}</div>
-          <ol class="definitions-list">
       `;
       
+      // Only show part-of-speech if not from offline dictionary
+      if (!definition.isOffline && meaning.partOfSpeech) {
+        html += `<div class="part-of-speech">${meaning.partOfSpeech}</div>`;
+      }
+      
+      html += `<ol class="definitions-list">`;
+
       meaning.definitions.forEach(def => {
         html += `<li>${def.definition}`;
         if (def.example) {
@@ -112,7 +123,7 @@ function createDefinitionHTML(word, definition) {
         }
         html += `</li>`;
       });
-      
+
       html += `</ol></div>`;
     });
   } else {

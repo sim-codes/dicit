@@ -65,6 +65,8 @@ class DicitBackground {
       tab: tab
     });
     
+    let wordToDefine = ''; // Declare at function scope
+    
     try {
       // Check if we have a tab object
       if (!tab) {
@@ -102,8 +104,6 @@ class DicitBackground {
       }
 
       console.log('Valid tab found with ID:', tab.id, 'URL:', tab.url);
-
-      let wordToDefine = '';
 
       if (info.menuItemId === "dicit-define") {
         wordToDefine = info.selectionText?.trim();
@@ -150,9 +150,9 @@ class DicitBackground {
   }
 
   async handlePdfContextMenu(info) {
+    let wordToDefine = ''; // Declare at function scope
+    
     try {
-      let wordToDefine = '';
-
       if (info.menuItemId === "dicit-define") {
         wordToDefine = info.selectionText?.trim();
       } else if (info.menuItemId === "dicit-define-prompt") {
@@ -221,17 +221,73 @@ class DicitBackground {
 
   async fetchDefinition(word) {
     try {
-      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+      // Check settings for offline mode
+      const settings = await chrome.storage.sync.get({
+        offlineMode: false
+      });
+
+      // If offline mode is enabled or no internet, use offline dictionary
+      if (settings.offlineMode || !navigator.onLine) {
+        return await this.fetchOfflineDefinition(word);
+      }
+
+      // Try online API first
+      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`, {
+        signal: AbortSignal.timeout(5000) // 5 second timeout
+      });
       
       if (!response.ok) {
-        throw new Error('Word not found');
+        throw new Error('Word not found online');
       }
 
       const data = await response.json();
       return data[0]; // Get the first result
     } catch (error) {
-      console.error('Error fetching definition:', error);
-      throw error;
+      console.log('Online fetch failed, trying offline dictionary:', error.message);
+      // Fallback to offline dictionary
+      return await this.fetchOfflineDefinition(word);
+    }
+  }
+
+  async fetchOfflineDefinition(word) {
+    try {
+      // Load offline dictionary data
+      const response = await fetch(chrome.runtime.getURL('data/dictionary.json'));
+      const dictionary = await response.json();
+      
+      const definition = dictionary[word.toLowerCase()];
+      if (!definition) {
+        // Try to find similar words for suggestions
+        const similarWords = Object.keys(dictionary)
+          .filter(key => key.startsWith(word.substring(0, 3).toLowerCase()))
+          .slice(0, 5);
+        
+        let errorMessage = `Word "${word}" not found in offline dictionary`;
+        if (similarWords.length > 0) {
+          errorMessage += `. Did you mean: ${similarWords.join(', ')}?`;
+        } else {
+          errorMessage += `. Available: ${Object.keys(dictionary).length} words offline.`;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      // Format offline definition to match API structure
+      return {
+        word: word,
+        meanings: [{
+          partOfSpeech: 'noun', // Default, could be enhanced
+          definitions: [{
+            definition: definition
+          }]
+        }],
+        isOffline: true
+      };
+    } catch (error) {
+      if (error.message.includes('not found in offline dictionary')) {
+        throw error; // Re-throw our custom error
+      }
+      throw new Error('Offline dictionary failed to load: ' + error.message);
     }
   }
 

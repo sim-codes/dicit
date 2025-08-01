@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dicit Dictionary Test - Your Offline Dictionary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .word-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .test-word {
+            background: #3498db;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .test-word:hover {
+            background: #2980b9;
+        }
+        .instructions {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .status {
+            background: #f39c12;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .word-count {
+            font-size: 1.2em;
+            color: #27ae60;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>📚 Dicit Dictionary - Your Custom Offline Dictionary Test</h1>
+    
+    <div class="word-count" id="wordCount">
+        Loading dictionary information...
+    </div>
+
+    <div class="instructions">
+        <h3>Testing Instructions:</h3>
+        <ol>
+            <li><strong>Your Dictionary:</strong> The extension now uses your custom dictionary with <strong>500+ real words</strong></li>
+            <li><strong>Online vs Offline:</strong> When online, the extension tries the internet first, then falls back to your offline dictionary</li>
+            <li><strong>Offline Mode:</strong> Enable "Offline mode" in the extension popup to always use your local dictionary</li>
+            <li><strong>Test Both:</strong> Try highlighting words below with and without internet connection</li>
+        </ol>
+    </div>
+
+    <div class="status" id="networkStatus">
+        <span id="statusText">🌐 Checking network status...</span>
+    </div>
+
+    <div class="test-section">
+        <h2>Words from Your Dictionary</h2>
+        <p>These words are available in your offline dictionary and should work even when offline:</p>
+        <div class="word-list">
+            <div class="test-word">anopheles</div>
+            <div class="test-word">sarong</div>
+            <div class="test-word">corrugator</div>
+            <div class="test-word">hawser</div>
+            <div class="test-word">bathos</div>
+            <div class="test-word">mixer</div>
+            <div class="test-word">conspirator</div>
+            <div class="test-word">wobble</div>
+            <div class="test-word">hempen</div>
+            <div class="test-word">saline</div>
+            <div class="test-word">vague</div>
+            <div class="test-word">advocacy</div>
+            <div class="test-word">hermit</div>
+            <div class="test-word">consequence</div>
+            <div class="test-word">naiad</div>
+            <div class="test-word">trombone</div>
+            <div class="test-word">epitome</div>
+            <div class="test-word">benevolence</div>
+            <div class="test-word">hydraulic</div>
+            <div class="test-word">fellowship</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Modern Words (NOT in Your Dictionary)</h2>
+        <p>These words will only work online (should show error message when offline):</p>
+        <div class="word-list">
+            <div class="test-word">serendipity</div>
+            <div class="test-word">ubiquitous</div>
+            <div class="test-word">ephemeral</div>
+            <div class="test-word">smartphone</div>
+            <div class="test-word">internet</div>
+            <div class="test-word">algorithm</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Features to Test</h2>
+        <ul>
+            <li><strong>Text Selection:</strong> Highlight any word above</li>
+            <li><strong>Context Menu:</strong> Right-click on any word and select "Define word"</li>
+            <li><strong>Manual Search:</strong> Right-click anywhere and select "Define word..." to enter custom words</li>
+            <li><strong>Offline Indicators:</strong> Look for 📚 OFFLINE, 🔒 NO INTERNET, or 📖 OFFLINE MODE badges</li>
+            <li><strong>Settings:</strong> Click the extension icon to toggle offline mode</li>
+            <li><strong>Error Messages:</strong> Try words not in dictionary to see helpful suggestions</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>Sample Text for Testing</h2>
+        <p>Here's some text with words from your dictionary: The <strong>anopheles</strong> mosquito is a <strong>conspirator</strong> in spreading malaria. The sailor adjusted the <strong>hawser</strong> while wearing his <strong>hempen</strong> clothes. The <strong>mixer</strong> created a solution of <strong>saline</strong> water. Her <strong>advocacy</strong> for the cause was never <strong>vague</strong>. The <strong>hermit</strong> lived in solitude, but the <strong>consequence</strong> of his wisdom was great. The <strong>naiad</strong> danced to the sound of the <strong>trombone</strong>, which was the <strong>epitome</strong> of musical <strong>benevolence</strong>.</p>
+        
+        <p>And here's text with words NOT in your dictionary: The <strong>serendipitous</strong> discovery was quite <strong>ephemeral</strong>, yet the researcher's analysis made the <strong>ubiquitous</strong> patterns clear through their <strong>smartphone</strong> and <strong>internet</strong> connection using complex <strong>algorithms</strong>.</p>
+    </div>
+
+    <script>
+        // Update network status indicator
+        function updateNetworkStatus() {
+            const statusText = document.getElementById('statusText');
+            const indicator = document.getElementById('networkStatus');
+            
+            if (navigator.onLine) {
+                statusText.textContent = '🌐 You are ONLINE - Extension will try online API first, then use your offline dictionary as fallback';
+                indicator.style.background = '#27ae60';
+            } else {
+                statusText.textContent = '🔒 You are OFFLINE - Extension will use your offline dictionary only';
+                indicator.style.background = '#e74c3c';
+            }
+        }
+
+        // Try to load dictionary info (this will only work if the extension loads the dictionary)
+        async function loadDictionaryInfo() {
+            try {
+                // This is just for display purposes - the actual dictionary loading happens in the extension
+                const wordCountElement = document.getElementById('wordCount');
+                wordCountElement.textContent = '📚 Your offline dictionary contains 500+ words from classical sources';
+                wordCountElement.style.color = '#27ae60';
+            } catch (error) {
+                console.log('Could not load dictionary info:', error);
+            }
+        }
+
+        // Initial status check
+        updateNetworkStatus();
+        loadDictionaryInfo();
+
+        // Listen for network changes
+        window.addEventListener('online', updateNetworkStatus);
+        window.addEventListener('offline', updateNetworkStatus);
+
+        // Make test words selectable on click
+        document.querySelectorAll('.test-word').forEach(word => {
+            word.addEventListener('click', function() {
+                // Create a selection for the clicked word
+                const range = document.createRange();
+                range.selectNode(this);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+                
+                // Optional: Clear selection after a moment
+                setTimeout(() => {
+                    selection.removeAllRanges();
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

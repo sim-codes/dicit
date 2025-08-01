@@ -49,7 +49,8 @@ class DicitDictionary {
       const settings = await chrome.storage.sync.get({
         includeExamples: true,
         showPhonetics: true,
-        includeAudio: true
+        includeAudio: true,
+        offlineMode: false
       });
       this.settings = settings;
       console.log('Settings loaded:', this.settings);
@@ -275,31 +276,88 @@ class DicitDictionary {
     });
     
     document.body.appendChild(this.tooltip);
-  }    async fetchDefinition(word) {
-        const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+  }
 
-        if (!response.ok) {
-            throw new Error('Word not found');
-        }
-
-        const data = await response.json();
-        return data[0]; // Get the first result
+  async fetchDefinition(word) {
+    // Check if offline mode is enabled or if we're offline
+    if (this.settings.offlineMode || !navigator.onLine) {
+      return this.fetchOfflineDefinition(word);
     }
+
+    try {
+      // Try online API first
+      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+
+      if (!response.ok) {
+        throw new Error('Word not found online');
+      }
+
+      const data = await response.json();
+      return data[0]; // Get the first result
+    } catch (error) {
+      console.log('Online fetch failed, trying offline dictionary:', error.message);
+      // Fallback to offline dictionary
+      return this.fetchOfflineDefinition(word);
+    }
+  }
+
+  async fetchOfflineDefinition(word) {
+    if (!this.offlineDictionary) {
+      this.offlineDictionary = new OfflineDictionary();
+    }
+    
+    if (!this.offlineDictionary.isLoaded) {
+      try {
+        await this.offlineDictionary.loadDictionary();
+      } catch (error) {
+        throw new Error('Offline dictionary failed to load: ' + error.message);
+      }
+    }
+
+    const offlineData = this.offlineDictionary.getDefinition(word);
+    if (!offlineData) {
+      // Try searching for similar words
+      const suggestions = this.offlineDictionary.searchByPrefix(word.substring(0, 3), 5);
+      let errorMessage = `Word "${word}" not found in offline dictionary`;
+      
+      if (suggestions.length > 0) {
+        errorMessage += `. Did you mean: ${suggestions.join(', ')}?`;
+      } else {
+        errorMessage += `. Available: ${this.offlineDictionary.getWordCount()} words offline.`;
+      }
+      
+      throw new Error(errorMessage);
+    }
+
+    return this.offlineDictionary.formatDefinition(word, offlineData);
+  }
 
   displayDefinition(selectedText, data) {
     if (!this.tooltip) return;
 
     const meanings = data.meanings || [];
     const audioUrl = this.getAudioUrl(data);
+    const isOfflineMode = this.settings.offlineMode || data.isOffline || !navigator.onLine;
+    
+    // Determine the source indicator
+    let sourceIndicator = '';
+    if (data.isOffline) {
+      sourceIndicator = '<span class="dicit-offline-badge">📚 OFFLINE</span>';
+    } else if (!navigator.onLine) {
+      sourceIndicator = '<span class="dicit-offline-badge">🔒 NO INTERNET</span>';
+    } else if (this.settings.offlineMode) {
+      sourceIndicator = '<span class="dicit-offline-badge">📖 OFFLINE MODE</span>';
+    }
     
     let definitionHtml = `
       <div class="dicit-header">
         <div class="dicit-word-info">
           <strong>${selectedText}</strong>
           ${this.settings.showPhonetics && data.phonetic ? `<span class="dicit-phonetic">${data.phonetic}</span>` : ''}
+          ${sourceIndicator}
         </div>
         <div class="dicit-controls">
-          ${this.settings.includeAudio && audioUrl ? `<button class="dicit-audio-btn" data-audio="${audioUrl}" title="Play pronunciation">🔊</button>` : ''}
+          ${this.settings.includeAudio && audioUrl && navigator.onLine ? `<button class="dicit-audio-btn" data-audio="${audioUrl}" title="Play pronunciation">🔊</button>` : ''}
           <button class="dicit-copy-btn" title="Copy definitions to clipboard">📋</button>
           <button class="dicit-close">&times;</button>
         </div>
@@ -473,10 +531,24 @@ class DicitDictionary {
   displayError(selectedText, errorMessage) {
     if (!this.tooltip) return;
 
+    // Determine if this is an offline error and add appropriate badge
+    const isOfflineError = errorMessage.includes('offline dictionary') || !navigator.onLine || this.settings.offlineMode;
+    let sourceIndicator = '';
+    if (isOfflineError) {
+      if (!navigator.onLine) {
+        sourceIndicator = '<span class="dicit-offline-badge">🔒 NO INTERNET</span>';
+      } else if (this.settings.offlineMode) {
+        sourceIndicator = '<span class="dicit-offline-badge">📖 OFFLINE MODE</span>';
+      } else {
+        sourceIndicator = '<span class="dicit-offline-badge">📚 OFFLINE</span>';
+      }
+    }
+
     this.tooltip.innerHTML = `
       <div class="dicit-header">
         <div class="dicit-word-info">
           <strong>${selectedText}</strong>
+          ${sourceIndicator}
         </div>
         <div class="dicit-controls">
           <button class="dicit-close">&times;</button>
@@ -484,7 +556,7 @@ class DicitDictionary {
       </div>
       <div class="dicit-content">
         <div class="dicit-error">
-          ${errorMessage === 'Word not found' ? 'No definition found for this word.' : 'Failed to fetch definition.'}
+          ${errorMessage}
         </div>
       </div>
     `;
